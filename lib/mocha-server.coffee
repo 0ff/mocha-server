@@ -28,13 +28,15 @@ class MochaServer
     @app = express()
     @cache = connectFileCache()
     @app.use @cache.middleware
-    
+
     # serve /public for each testPath, so that we can use static resources in tests
     for testPath in @testPaths
       p = path.join(path.resolve(path.dirname(testPath)), 'public')
       console.log 'serving ' + p
       @app.use express.static p
-    
+
+    # make sure we *always* use our own version of jade, must be set for this to work with npm@3.x
+    @app.engine 'jade', require('jade').__express
     @app.set "view engine", "jade"
     @app.set 'views', "#{__dirname}/../views"
 
